@@ -1,0 +1,13 @@
+{
+  "name": "reach-linkedin",
+  "version": "1.0.0",
+  "description": "Free self-hosted Unipile alternative for LinkedIn — HTTP gateway wrapping linkedin-mcp (patchright stealth + Voyager). Powers FoundReach 'Reach'.",
+  "type": "module",
+  "main": "index.mjs",
+  "scripts": {
+    "start": "node index.mjs",
+    "login": "npx -y linkedin-mcp-tools@latest --login"
+  },
+  "engines": { "node": ">=20" },
+  "license": "MIT"
+}

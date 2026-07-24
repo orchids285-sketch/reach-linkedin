@@ -19,7 +19,13 @@ import { spawn } from "node:child_process";
 const PORT = parseInt(process.env.PORT || "8080", 10);
 const TOKEN = process.env.GATEWAY_TOKEN || "";
 const MCP_CMD = process.env.MCP_CMD || "npx";
-const MCP_ARGS = (process.env.MCP_ARGS || "-y linkedin-mcp-tools@latest").split(" ").filter(Boolean);
+// If MCP_CMD is the global bin (Docker), it takes NO args. Only the `npx` path
+// needs the package spec. An explicitly-set MCP_ARGS (even "") overrides.
+const DEFAULT_ARGS = MCP_CMD === "npx" ? ["-y", "linkedin-mcp-tools@latest"] : [];
+const MCP_ARGS =
+  process.env.MCP_ARGS !== undefined && process.env.MCP_ARGS !== ""
+    ? process.env.MCP_ARGS.split(" ").filter(Boolean)
+    : DEFAULT_ARGS;
 
 // ── Minimal MCP stdio client (JSON-RPC over the linkedin-mcp subprocess) ──
 class McpClient {

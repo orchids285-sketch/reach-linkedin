@@ -110,14 +110,21 @@ const server = http.createServer(async (req, res) => {
     const path = url.pathname;
     if (path === "/health") return send(res, 200, { ok: true, engine: "linkedin-mcp" });
 
-    // status: is a LinkedIn session connected? (whoami via the engine)
+    // status: is a LinkedIn session actually logged in? (whoami via the engine)
     if (path === "/status") {
       try {
         const r = await mcp.callTool("whoami", {});
-        const connected = r.ok && r.data && (typeof r.data === "object");
-        return send(res, 200, { ok: true, connected: Boolean(connected), account: r.data ?? null });
+        const d = (r.data && typeof r.data === "object") ? r.data : {};
+        // whoami shape: { data: { loggedIn, server, tools, ... } }
+        const loggedIn = d?.data?.loggedIn ?? d?.loggedIn ?? false;
+        return send(res, 200, {
+          ok: true,
+          engineUp: Boolean(r.ok),
+          connected: Boolean(loggedIn),
+          account: r.data ?? null,
+        });
       } catch (e) {
-        return send(res, 200, { ok: true, connected: false, reason: String(e).slice(0, 160) });
+        return send(res, 200, { ok: true, engineUp: false, connected: false, reason: String(e).slice(0, 160) });
       }
     }
 
